@@ -80,6 +80,7 @@ import static org.apache.flink.streaming.connectors.kafka.table.KafkaConnectorOp
 import static org.apache.flink.streaming.connectors.kafka.table.KafkaConnectorOptions.SCAN_TOPIC_PARTITION_DISCOVERY;
 import static org.apache.flink.streaming.connectors.kafka.table.KafkaConnectorOptions.SINK_PARALLELISM;
 import static org.apache.flink.streaming.connectors.kafka.table.KafkaConnectorOptions.SINK_PARTITIONER;
+import static org.apache.flink.streaming.connectors.kafka.table.KafkaConnectorOptions.SOURCE_PARALLELISM;
 import static org.apache.flink.streaming.connectors.kafka.table.KafkaConnectorOptions.TOPIC;
 import static org.apache.flink.streaming.connectors.kafka.table.KafkaConnectorOptions.TOPIC_PATTERN;
 import static org.apache.flink.streaming.connectors.kafka.table.KafkaConnectorOptions.TRANSACTIONAL_ID_PREFIX;
@@ -152,6 +153,7 @@ public class KafkaDynamicTableFactory
         options.add(SCAN_BOUNDED_MODE);
         options.add(SCAN_BOUNDED_SPECIFIC_OFFSETS);
         options.add(SCAN_BOUNDED_TIMESTAMP_MILLIS);
+        options.add(SOURCE_PARALLELISM);
         return options;
     }
 
@@ -166,6 +168,7 @@ public class KafkaDynamicTableFactory
                         SCAN_STARTUP_SPECIFIC_OFFSETS,
                         SCAN_TOPIC_PARTITION_DISCOVERY,
                         SCAN_STARTUP_TIMESTAMP_MILLIS,
+                        SOURCE_PARALLELISM,
                         SINK_PARTITIONER,
                         SINK_PARALLELISM,
                         TRANSACTIONAL_ID_PREFIX)
@@ -215,6 +218,8 @@ public class KafkaDynamicTableFactory
 
         final String keyPrefix = tableOptions.getOptional(KEY_FIELDS_PREFIX).orElse(null);
 
+        final Integer parallelism = tableOptions.getOptional(SOURCE_PARALLELISM).orElse(null);
+
         return createKafkaTableSource(
                 physicalDataType,
                 keyDecodingFormat.orElse(null),
@@ -231,7 +236,8 @@ public class KafkaDynamicTableFactory
                 boundedOptions.boundedMode,
                 boundedOptions.specificOffsets,
                 boundedOptions.boundedTimestampMillis,
-                context.getObjectIdentifier().asSummaryString());
+                context.getObjectIdentifier().asSummaryString(),
+                parallelism);
     }
 
     @Override
@@ -395,7 +401,8 @@ public class KafkaDynamicTableFactory
             BoundedMode boundedMode,
             Map<KafkaTopicPartition, Long> specificEndOffsets,
             long endTimestampMillis,
-            String tableIdentifier) {
+            String tableIdentifier,
+            Integer parallelism) {
         return new KafkaDynamicSource(
                 physicalDataType,
                 keyDecodingFormat,
@@ -413,7 +420,8 @@ public class KafkaDynamicTableFactory
                 specificEndOffsets,
                 endTimestampMillis,
                 false,
-                tableIdentifier);
+                tableIdentifier,
+                parallelism);
     }
 
     protected KafkaDynamicSink createKafkaTableSink(

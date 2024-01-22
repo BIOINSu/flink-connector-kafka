@@ -106,6 +106,8 @@ public class KafkaConnectorOptions {
                                                     ValueFieldsStrategy.EXCEPT_KEY))
                                     .build());
 
+    public static final ConfigOption<Integer> SOURCE_PARALLELISM = FactoryUtil.SOURCE_PARALLELISM;
+
     public static final ConfigOption<Integer> SINK_PARALLELISM = FactoryUtil.SINK_PARALLELISM;
 
     // --------------------------------------------------------------------------------------------

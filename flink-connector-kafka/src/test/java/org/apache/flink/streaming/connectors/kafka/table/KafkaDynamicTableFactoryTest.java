@@ -1207,7 +1207,8 @@ public class KafkaDynamicTableFactoryTest {
                 Collections.emptyMap(),
                 0,
                 false,
-                FactoryMocks.IDENTIFIER.asSummaryString());
+                FactoryMocks.IDENTIFIER.asSummaryString(),
+                null);
     }
 
     private static KafkaDynamicSink createExpectedSink(
